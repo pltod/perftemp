@@ -19,7 +19,7 @@ var app = app || {};
 
 	var ENTER_KEY = 13;
 
-	var TodoApp = React.createClass({
+	var TodoApp = React.createClass({displayName: 'TodoApp',
 		getInitialState: function () {
 			return {
 				nowShowing: app.ALL_TODOS,
@@ -104,16 +104,16 @@ var app = app || {};
 
 			var todoItems = shownTodos.map(function (todo) {
 				return (
-					<TodoItem
-						key={todo.id}
-						todo={todo}
-						onToggle={this.toggle.bind(this, todo)}
-						onDestroy={this.destroy.bind(this, todo)}
-						onEdit={this.edit.bind(this, todo)}
-						editing={this.state.editing === todo.id}
-						onSave={this.save.bind(this, todo)}
-						onCancel={this.cancel}
-					/>
+					TodoItem(
+						{key:todo.id,
+						todo:todo,
+						onToggle:this.toggle.bind(this, todo),
+						onDestroy:this.destroy.bind(this, todo),
+						onEdit:this.edit.bind(this, todo),
+						editing:this.state.editing === todo.id,
+						onSave:this.save.bind(this, todo),
+						onCancel:this.cancel}
+					)
 				);
 			}, this);
 
@@ -125,45 +125,45 @@ var app = app || {};
 
 			if (activeTodoCount || completedCount) {
 				footer =
-					<TodoFooter
-						count={activeTodoCount}
-						completedCount={completedCount}
-						nowShowing={this.state.nowShowing}
-						onClearCompleted={this.clearCompleted}
-					/>;
+					TodoFooter(
+						{count:activeTodoCount,
+						completedCount:completedCount,
+						nowShowing:this.state.nowShowing,
+						onClearCompleted:this.clearCompleted}
+					);
 			}
 
 			if (todos.length) {
 				main = (
-					<section id="main">
-						<input
-							id="toggle-all"
-							type="checkbox"
-							onChange={this.toggleAll}
-							checked={activeTodoCount === 0}
-						/>
-						<ul id="todo-list">
-							{todoItems}
-						</ul>
-					</section>
+					React.DOM.section( {id:"main"}, 
+						React.DOM.input(
+							{id:"toggle-all",
+							type:"checkbox",
+							onChange:this.toggleAll,
+							checked:activeTodoCount === 0}
+						),
+						React.DOM.ul( {id:"todo-list"}, 
+							todoItems
+						)
+					)
 				);
 			}
 
 			return (
-				<div>
-					<header id="header">
-						<h1>todos</h1>
-						<input
-							ref="newField"
-							id="new-todo"
-							placeholder="What needs to be done?"
-							onKeyDown={this.handleNewTodoKeyDown}
-							autoFocus={true}
-						/>
-					</header>
-					{main}
-					{footer}
-				</div>
+				React.DOM.div(null, 
+					React.DOM.header( {id:"header"}, 
+						React.DOM.h1(null, "todos"),
+						React.DOM.input(
+							{ref:"newField",
+							id:"new-todo",
+							placeholder:"What needs to be done?",
+							onKeyDown:this.handleNewTodoKeyDown,
+							autoFocus:true}
+						)
+					),
+					main,
+					footer
+				)
 			);
 		}
 	});
@@ -172,7 +172,7 @@ var app = app || {};
 
 	function render() {
 		React.renderComponent(
-			<TodoApp model={model}/>,
+			TodoApp( {model:model}),
 			document.getElementById('todoapp')
 		);
 	}
