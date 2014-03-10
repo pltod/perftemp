@@ -4,6 +4,7 @@ var Suites = [];
 Suites.push({
     name: 'Vue',
     url: 'vue/index.html',
+    version: '0.9.3',
     prepare: function (runner, contentWindow, contentDocument) {
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
@@ -14,8 +15,11 @@ Suites.push({
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
             var app = contentWindow.app;
             for (var i = 0; i < numberOfItemsToAdd; i++) {
+                var keyupEvent = document.createEvent('Event');
+                keyupEvent.initEvent('keyup', true, true);
+                keyupEvent.keyCode = 13;
                 app.newTodo = 'Something to do ' + i;
-                app.addTodo()
+                newTodo.dispatchEvent(keyupEvent)
             }
         }),
         new BenchmarkTestStep('CompletingAllItems', function (newTodo, contentWindow, contentDocument) {
@@ -34,6 +38,7 @@ Suites.push({
 Suites.push({
     name: 'Backbone',
     url: 'todomvc/architecture-examples/backbone/index.html',
+    version: '1.1.2',
     prepare: function (runner, contentWindow, contentDocument) {
     contentWindow.Backbone.sync = function () {}
         return runner.waitForElement('#new-todo').then(function (element) {
@@ -44,10 +49,12 @@ Suites.push({
     tests: [
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
             var appView = contentWindow.appView;
-            var fakeEvent = {which: contentWindow.ENTER_KEY};
             for (var i = 0; i < numberOfItemsToAdd; i++) {
+                var keypressEvent = document.createEvent('Event');
+                keypressEvent.initEvent('keypress', true, true);
+                keypressEvent.which = 13;
                 newTodo.value = 'Something to do ' + i;
-                appView.createOnEnter(fakeEvent);
+                newTodo.dispatchEvent(keypressEvent)
             }
         }),
         new BenchmarkTestStep('CompletingAllItems', function (newTodo, contentWindow, contentDocument) {
@@ -66,6 +73,7 @@ Suites.push({
 Suites.push({
     name: 'Knockout',
     url: 'todomvc/architecture-examples/knockoutjs/index.html',
+    version: '3.1.0',
     prepare: function (runner, contentWindow, contentDocument) {
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
@@ -76,8 +84,11 @@ Suites.push({
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
             var viewModel = contentWindow.viewModel;
             for (var i = 0; i < numberOfItemsToAdd; i++) {
+                var keyupEvent = document.createEvent('Event');
+                keyupEvent.initEvent('keyup', true, true);
+                keyupEvent.keyCode = 13;
                 viewModel.current('Something to do ' + i);
-                viewModel.add()
+                newTodo.dispatchEvent(keyupEvent);
             }
         }),
         new BenchmarkTestStep('CompletingAllItems', function (newTodo, contentWindow, contentDocument) {
@@ -96,6 +107,7 @@ Suites.push({
 Suites.push({
     name: 'Ember',
     url: 'todomvc/architecture-examples/emberjs/index.html',
+    version: '1.4.0 + Handlebars 1.3.0',
     prepare: function (runner, contentWindow, contentDocument) {
         contentWindow.Todos.Store = contentWindow.DS.Store.extend({
             revision: 12,
@@ -106,16 +118,22 @@ Suites.push({
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
             return {
+                newTodo: element,
                 views: contentWindow.Ember.View.views,
-                emberRun: contentWindow.Ember.run,
+                emberRun: contentWindow.Ember.run
             }
         });
     },
     tests: [
-        new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (params) {
+        new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (params, contentWindow) {
             for (var i = 0; i < numberOfItemsToAdd; i++) {
                 params.emberRun(function () { params.views["new-todo"].set('value', 'Something to do' + i); });
-                params.emberRun(function () { params.views["new-todo"].insertNewline(document.createEvent('Event')); });
+                params.emberRun(function () {
+                    var keyupEvent = document.createEvent('Event');
+                    keyupEvent.initEvent('keyup', true, true);
+                    keyupEvent.keyCode = 13;
+                    params.newTodo.dispatchEvent(keyupEvent)
+                });
             }
         }),
         new BenchmarkTestStep('CompletingAllItems', function (params, contentWindow, contentDocument) {
@@ -136,6 +154,7 @@ Suites.push({
 Suites.push({
     name: 'Angular',
     url: 'todomvc/architecture-examples/angularjs-perf/index.html',
+    version: '1.2.14',
     prepare: function (runner, contentWindow, contentDocument) {
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
@@ -144,12 +163,11 @@ Suites.push({
     },
     tests: [
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
-            var todomvc = contentWindow.todomvc;
             var submitEvent = document.createEvent('Event');
             submitEvent.initEvent('submit', true, true);
-            var inputEvent = document.createEvent('Event');
-            inputEvent.initEvent('input', true, true);
             for (var i = 0; i < numberOfItemsToAdd; i++) {
+                var inputEvent = document.createEvent('Event');
+                inputEvent.initEvent('input', true, true);
                 newTodo.value = 'Something to do ' + i;
                 newTodo.dispatchEvent(inputEvent);
                 newTodo.form.dispatchEvent(submitEvent);
@@ -171,6 +189,7 @@ Suites.push({
 Suites.push({
     name: 'React',
     url: 'todomvc/architecture-examples/react/index.html',
+    version: '0.9.0',
     prepare: function (runner, contentWindow, contentDocument) {
         contentWindow.Utils.store = function () {}
         return runner.waitForElement('#new-todo').then(function (element) {
@@ -180,13 +199,11 @@ Suites.push({
     },
     tests: [
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
-            var todomvc = contentWindow.todomvc;
             for (var i = 0; i < numberOfItemsToAdd; i++) {
-                newTodo.value = 'Something to do ' + i;
-
                 var keydownEvent = document.createEvent('Event');
                 keydownEvent.initEvent('keydown', true, true);
                 keydownEvent.which = 13; // VK_ENTER
+                newTodo.value = 'Something to do ' + i;
                 newTodo.dispatchEvent(keydownEvent);
             }
         }),
@@ -206,6 +223,7 @@ Suites.push({
 Suites.push({
     name: 'Om',
     url: 'todomvc/labs/architecture-examples/om/index.html',
+    version: '? + React 0.8.0',
     prepare: function (runner, contentWindow, contentDocument) {
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
@@ -216,11 +234,10 @@ Suites.push({
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
             var todomvc = contentWindow.todomvc;
             for (var i = 0; i < numberOfItemsToAdd; i++) {
-                newTodo.value = 'Something to do ' + i;
-
                 var keydownEvent = document.createEvent('Event');
                 keydownEvent.initEvent('keydown', true, true);
                 keydownEvent.which = 13; // VK_ENTER
+                newTodo.value = 'Something to do ' + i;
                 newTodo.dispatchEvent(keydownEvent);
             }
         }),
@@ -240,6 +257,7 @@ Suites.push({
 Suites.push({
     name: 'Ractive',
     url: 'todomvc/labs/architecture-examples/ractive/index.html',
+    version: '0.3.9',
     prepare: function (runner, contentWindow, contentDocument) {
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
@@ -249,11 +267,10 @@ Suites.push({
     tests: [
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
             for (var i = 0; i < numberOfItemsToAdd; i++) {
-                newTodo.value = 'Something to do ' + i;
-
                 var keydownEvent = document.createEvent('Event');
                 keydownEvent.initEvent('keydown', true, true);
                 keydownEvent.which = 13; // VK_ENTER
+                newTodo.value = 'Something to do ' + i;
                 newTodo.dispatchEvent(keydownEvent);
             }
         }),
