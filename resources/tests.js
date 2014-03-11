@@ -292,7 +292,7 @@ Suites.push({
     url: 'todomvc/architecture-examples/polymer/index.html',
     version: '0.0.1',
     prepare: function (runner, contentWindow, contentDocument) {
-        return runner.waitForElement('#new-todo').then(function (element) {
+        return runner.waitForElement('#model').then(function (element) {
             element.focus();
             return element;
         });
