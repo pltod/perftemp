@@ -5,14 +5,14 @@
 
 **PURPOSE**
 
-Original initial code is taken from:
+Benchmark for MV* Frameworks based on their performance running TODO MVC application.
+
+Original initial benchmark and code is taken from:
 
 > https://github.com/vuejs/vuejs.org/tree/master/perf/todomvc-benchmark
 
 
-Test some more frameworks from the one added inside the original test suite.
-
-The additional frameworks source code is taken from:
+Here are added some more frameworks taken from:
 
 > http://todomvc.com/
 
